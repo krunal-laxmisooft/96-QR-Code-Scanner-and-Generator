@@ -9,14 +9,15 @@ import com.app.vv.infscan.analytics.AnalyticsTracker
 import com.app.vv.infscan.core.ApplicationScope
 import com.app.vv.infscan.data.prefs.SettingsRepository
 import com.google.android.libraries.ads.mobile.sdk.MobileAds
-import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAd
 import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAdEventCallback
 import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAdPreloader
 import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAdRequest
 import com.google.android.libraries.ads.mobile.sdk.common.AdRequest
 import com.google.android.libraries.ads.mobile.sdk.common.AdValue
 import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.PreloadCallback
 import com.google.android.libraries.ads.mobile.sdk.common.PreloadConfiguration
+import com.google.android.libraries.ads.mobile.sdk.common.ResponseInfo
 import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig
 import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAd
 import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAdEventCallback
@@ -39,6 +40,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -63,7 +65,8 @@ class GoogleAdManager @Inject constructor(
 
     private val startMutex = Mutex()
     private val interstitialPolicy = InterstitialPolicy()
-    private var appOpenShownThisProcess = false
+    private var appOpenAttempted = false
+    private var appOpenRequest: AppOpenRequest? = null
     private var fullScreenShowing = false
 
     override suspend fun start(activity: Activity) = startMutex.withLock {
@@ -107,29 +110,49 @@ class GoogleAdManager @Inject constructor(
         .metaData.getString("com.google.android.gms.ads.APPLICATION_ID").orEmpty()
 
     private fun preloadAll() {
-        AppOpenAdPreloader.start(BuildConfig.AD_APP_OPEN, PreloadConfiguration(AppOpenAdRequest.Builder(BuildConfig.AD_APP_OPEN).build()))
+        AppOpenAdPreloader.start(
+            BuildConfig.AD_APP_OPEN,
+            PreloadConfiguration(AppOpenAdRequest.Builder(BuildConfig.AD_APP_OPEN).build()),
+            object : PreloadCallback {
+                override fun onAdPreloaded(preloadId: String, responseInfo: ResponseInfo) {
+                    scope.launch { tryShowAppOpen() }
+                }
+            },
+        )
         InterstitialAdPreloader.start(BuildConfig.AD_INTERSTITIAL, PreloadConfiguration(AdRequest.Builder(BuildConfig.AD_INTERSTITIAL).build()))
         RewardedAdPreloader.start(BuildConfig.AD_REWARDED, PreloadConfiguration(AdRequest.Builder(BuildConfig.AD_REWARDED).build()))
     }
 
     override fun showAppOpenIfAllowed(activity: Activity, launchedBefore: Boolean) {
-        if (!_canShowAds.value || appOpenShownThisProcess || fullScreenShowing) return
-        appOpenShownThisProcess = true
-        scope.launch {
-            val now = System.currentTimeMillis()
-            val allowed = AppOpenPolicy.canShow(now, settings.firstLaunchAt(), launchedBefore, settings.lastAppOpenAdAt())
-            if (!allowed) return@launch
-            val ad = AppOpenAdPreloader.pollAd(BuildConfig.AD_APP_OPEN) ?: return@launch
-            ad.adEventCallback = object : AppOpenAdEventCallback {
-                private val paid = PaidOnce(AdFormatName.APP_OPEN, AdPlacement.APP_OPEN_COLD)
-                override fun onAdPaid(value: AdValue) = paid.log(value)
-                override fun onAdShowedFullScreenContent() { fullScreenShowing = true }
-                override fun onAdDismissedFullScreenContent() { fullScreenShowing = false }
-                override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) { fullScreenShowing = false }
-            }
-            settings.setLastAppOpenAdAt(now)
-            ad.show(activity)
+        if (appOpenRequest != null || appOpenAttempted) return
+        appOpenAttempted = true
+        appOpenRequest = AppOpenRequest(WeakReference(activity), launchedBefore, System.currentTimeMillis() + APP_OPEN_WINDOW_MS)
+        scope.launch { tryShowAppOpen() }
+    }
+
+    /** Shows the cold-start ad only if it is ready within a short window, so it never delays the app. */
+    private suspend fun tryShowAppOpen() {
+        val request = appOpenRequest ?: return
+        val now = System.currentTimeMillis()
+        val activity = request.activity.get()
+        if (activity == null || now > request.deadline || !_canShowAds.value || fullScreenShowing) {
+            if (activity == null || now > request.deadline) appOpenRequest = null
+            return
         }
+        if (!AppOpenAdPreloader.isAdAvailable(BuildConfig.AD_APP_OPEN)) return
+        appOpenRequest = null
+        val allowed = AppOpenPolicy.canShow(now, settings.firstLaunchAt(), request.launchedBefore, settings.lastAppOpenAdAt())
+        if (!allowed) return
+        val ad = AppOpenAdPreloader.pollAd(BuildConfig.AD_APP_OPEN) ?: return
+        ad.adEventCallback = object : AppOpenAdEventCallback {
+            private val paid = PaidOnce(AdFormatName.APP_OPEN, AdPlacement.APP_OPEN_COLD)
+            override fun onAdPaid(value: AdValue) = paid.log(value)
+            override fun onAdShowedFullScreenContent() { fullScreenShowing = true }
+            override fun onAdDismissedFullScreenContent() { fullScreenShowing = false }
+            override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) { fullScreenShowing = false }
+        }
+        settings.setLastAppOpenAdAt(now)
+        ad.show(activity)
     }
 
     override fun showInterstitial(activity: Activity, placement: AdPlacement, onFinished: () -> Unit) {
@@ -206,6 +229,10 @@ class GoogleAdManager @Inject constructor(
         }
     }
 }
+
+private class AppOpenRequest(val activity: WeakReference<Activity>, val launchedBefore: Boolean, val deadline: Long)
+
+private const val APP_OPEN_WINDOW_MS = 5_000L
 
 internal object AdFormatName {
     const val BANNER = "banner"

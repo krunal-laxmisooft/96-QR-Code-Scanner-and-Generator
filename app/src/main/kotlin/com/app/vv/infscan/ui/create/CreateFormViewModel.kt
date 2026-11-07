@@ -1,5 +1,6 @@
 package com.app.vv.infscan.ui.create
 
+import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,7 +33,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateFormViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val history: HistoryRepository,
     private val analytics: AnalyticsTracker,
     private val clock: Clock,
@@ -40,7 +41,9 @@ class CreateFormViewModel @Inject constructor(
 
     private val type: CreateType = CreateType.valueOf(savedStateHandle.toRoute<CreateFormDest>().type)
 
-    private val _state = MutableStateFlow(CreateFormUiState(type, initialValues(type)))
+    private val _state = MutableStateFlow(
+        CreateFormUiState(type, savedStateHandle.get<Bundle>(VALUES_KEY)?.let(FormValuesSaver::restore) ?: initialValues(type)),
+    )
     val state: StateFlow<CreateFormUiState> = _state.asStateFlow()
 
     private val _effects = Channel<CreateFormEffect>(Channel.BUFFERED)
@@ -51,6 +54,11 @@ class CreateFormViewModel @Inject constructor(
     }
 
     fun onEvent(event: CreateFormEvent) {
+        reduce(event)
+        savedStateHandle[VALUES_KEY] = FormValuesSaver.save(_state.value.values)
+    }
+
+    private fun reduce(event: CreateFormEvent) {
         when (event) {
             is CreateFormEvent.FieldChanged -> _state.update {
                 it.copy(values = it.values.copy(text = it.values.text + (event.field to event.text)), errors = it.errors - event.field)
@@ -97,6 +105,7 @@ class CreateFormViewModel @Inject constructor(
     }
 
     private companion object {
+        const val VALUES_KEY = "form_values"
         val HOUR_MS = TimeUnit.HOURS.toMillis(1)
     }
 }

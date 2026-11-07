@@ -6,8 +6,3 @@ sealed interface AppResult<out T> {
 }
 
 enum class FailureReason { OFFLINE, NOT_FOUND, SERVICE, UNKNOWN }
-
-inline fun <T, R> AppResult<T>.map(transform: (T) -> R): AppResult<R> = when (this) {
-    is AppResult.Success -> AppResult.Success(transform(value))
-    is AppResult.Failure -> this
-}

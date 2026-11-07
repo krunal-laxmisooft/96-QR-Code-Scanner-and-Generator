@@ -102,6 +102,27 @@ class CreateFormViewModelTest {
         assertEquals(start + 12 * 3_600_000L, vm.state.value.values.endMillis)
     }
 
+    @Test fun `a half filled form survives process death`() {
+        val handle = SavedStateHandle(mapOf("type" to "WIFI"))
+        val first = CreateFormViewModel(handle, history, analytics, clock)
+        first.onEvent(CreateFormEvent.FieldChanged(FormField.SSID, "Lumen-Guest"))
+        first.onEvent(CreateFormEvent.SecuritySelected(WifiSecurity.WEP))
+        first.onEvent(CreateFormEvent.HiddenChanged(true))
+        val restored = CreateFormViewModel(handle, history, analytics, clock).state.value.values
+        assertEquals("Lumen-Guest", restored.text[FormField.SSID])
+        assertEquals(WifiSecurity.WEP, restored.security)
+        assertTrue(restored.hidden)
+    }
+
+    @Test fun `an event form keeps its times after restore`() {
+        val handle = SavedStateHandle(mapOf("type" to "EVENT"))
+        val first = CreateFormViewModel(handle, history, analytics, clock)
+        first.onEvent(CreateFormEvent.StartChanged(1_800_000_000_000L))
+        val restored = CreateFormViewModel(handle, history, analytics, clock).state.value.values
+        assertEquals(1_800_000_000_000L, restored.startMillis)
+        assertEquals(1_800_003_600_000L, restored.endMillis)
+    }
+
     @Test fun `password visibility toggles`() {
         val vm = vm("WIFI")
         vm.onEvent(CreateFormEvent.TogglePassword)

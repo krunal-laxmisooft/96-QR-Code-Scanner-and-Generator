@@ -1,5 +1,6 @@
 package com.app.vv.infscan.ui
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.app.vv.infscan.data.prefs.AppSettings
 import com.app.vv.infscan.data.prefs.ThemeMode
@@ -35,7 +36,7 @@ class HistoryViewModelTest {
     private val history = FakeHistoryRepository()
     private val analytics = RecordingAnalytics()
 
-    private fun vm() = HistoryViewModel(history, analytics, MutableClock(10_000L))
+    private fun vm(handle: SavedStateHandle = SavedStateHandle()) = HistoryViewModel(handle, history, analytics, MutableClock(10_000L))
 
     private fun kotlinx.coroutines.test.TestScope.watch(vm: HistoryViewModel) {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.state.collect {} }
@@ -75,6 +76,20 @@ class HistoryViewModelTest {
         vm.onEvent(HistoryEvent.ToggleSearch)
         assertFalse(vm.state.value.searching)
         assertEquals("", vm.state.value.query)
+    }
+
+    @Test fun `tab filter and search survive process death`() = runTest {
+        val handle = SavedStateHandle()
+        val first = vm(handle).also { watch(it) }
+        first.onEvent(HistoryEvent.SelectTab(HistoryKind.CREATED))
+        first.onEvent(HistoryEvent.SelectFilter(HistoryFilter.LINKS))
+        first.onEvent(HistoryEvent.ToggleSearch)
+        first.onEvent(HistoryEvent.QueryChanged("lumen"))
+        val restored = vm(handle).also { watch(it) }
+        assertEquals(HistoryKind.CREATED, restored.state.value.tab)
+        assertEquals(HistoryFilter.LINKS, restored.state.value.filter)
+        assertTrue(restored.state.value.searching)
+        assertEquals("lumen", restored.state.value.query)
     }
 
     @Test fun `favorite delete and restore`() = runTest {
@@ -134,6 +149,7 @@ class HistoryViewModelTest {
     }
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SettingsViewModelTest {
     @get:Rule val main = MainDispatcherRule()
 

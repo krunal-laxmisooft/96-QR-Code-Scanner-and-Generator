@@ -35,6 +35,10 @@ import com.app.vv.infscan.ui.components.InfTopBar
 import com.app.vv.infscan.ui.components.TypeChip
 import com.app.vv.infscan.ui.theme.InfTheme
 import com.app.vv.infscan.ui.theme.Space
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 @Composable
 fun ResultScreen(
@@ -112,7 +116,13 @@ fun ResultHeader(item: HistoryItem, parsed: ParsedCode, @StringRes kindLabel: In
     }
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
         TypeChip(parsed.kind.icon(), stringResource(kindLabel))
-        Text(stringResource(R.string.result_source, stringResource(item.format.label()), stringResource(source)), style = InfTheme.type.caption.copy(fontSize = InfTheme.type.bodySmall.fontSize), color = c.inkSecondary)
+        Text(
+            stringResource(R.string.result_source, stringResource(item.format.label()), stringResource(source)),
+            style = InfTheme.type.caption.copy(fontSize = InfTheme.type.bodySmall.fontSize),
+            color = c.inkSecondary,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1f).padding(start = Space.sm),
+        )
     }
 }
 
@@ -237,6 +247,6 @@ private fun primaryAction(parsed: ParsedCode): Pair<Int, Int>? = when (parsed) {
 }
 
 private fun formatDateTime(millis: Long): String {
-    val formatter = java.time.format.DateTimeFormatter.ofLocalizedDateTime(java.time.format.FormatStyle.MEDIUM, java.time.format.FormatStyle.SHORT)
-    return formatter.format(java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneId.systemDefault()))
+    val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
+    return formatter.format(Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()))
 }

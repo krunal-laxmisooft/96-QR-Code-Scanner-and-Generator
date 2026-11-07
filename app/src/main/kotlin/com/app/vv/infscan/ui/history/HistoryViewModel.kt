@@ -1,5 +1,6 @@
 package com.app.vv.infscan.ui.history
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.vv.infscan.analytics.AnalyticsEvents
@@ -26,6 +27,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val history: HistoryRepository,
     private val analytics: AnalyticsTracker,
     private val clock: Clock,
@@ -39,7 +41,7 @@ class HistoryViewModel @Inject constructor(
         val exportSheetCount: Int? = null,
     )
 
-    private val controls = MutableStateFlow(Controls())
+    private val controls = MutableStateFlow(restoreControls())
 
     private val _effects = Channel<HistoryEffect>(Channel.BUFFERED)
     val effects = _effects.receiveAsFlow()
@@ -64,12 +66,28 @@ class HistoryViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), HistoryUiState())
 
+    private fun restoreControls() = Controls(
+        tab = savedStateHandle.get<String>(TAB_KEY)?.let { runCatching { HistoryKind.valueOf(it) }.getOrNull() } ?: HistoryKind.SCANNED,
+        filter = savedStateHandle.get<String>(FILTER_KEY)?.let { runCatching { HistoryFilter.valueOf(it) }.getOrNull() } ?: HistoryFilter.ALL,
+        query = savedStateHandle.get<String>(QUERY_KEY).orEmpty(),
+        searching = savedStateHandle.get<Boolean>(SEARCHING_KEY) ?: false,
+    )
+
+    private fun updateControls(transform: (Controls) -> Controls) {
+        controls.update(transform)
+        val c = controls.value
+        savedStateHandle[TAB_KEY] = c.tab.name
+        savedStateHandle[FILTER_KEY] = c.filter.name
+        savedStateHandle[QUERY_KEY] = c.query
+        savedStateHandle[SEARCHING_KEY] = c.searching
+    }
+
     fun onEvent(event: HistoryEvent) {
         when (event) {
-            is HistoryEvent.SelectTab -> controls.update { it.copy(tab = event.tab, filter = HistoryFilter.ALL, query = "", searching = false) }
-            is HistoryEvent.SelectFilter -> controls.update { it.copy(filter = event.filter) }
-            is HistoryEvent.QueryChanged -> controls.update { it.copy(query = event.query) }
-            HistoryEvent.ToggleSearch -> controls.update { it.copy(searching = !it.searching, query = "") }
+            is HistoryEvent.SelectTab -> updateControls { it.copy(tab = event.tab, filter = HistoryFilter.ALL, query = "", searching = false) }
+            is HistoryEvent.SelectFilter -> updateControls { it.copy(filter = event.filter) }
+            is HistoryEvent.QueryChanged -> updateControls { it.copy(query = event.query) }
+            HistoryEvent.ToggleSearch -> updateControls { it.copy(searching = !it.searching, query = "") }
             is HistoryEvent.ToggleFavorite -> viewModelScope.launch { history.setFavorite(event.item.id, !event.item.favorite) }
             is HistoryEvent.Delete -> viewModelScope.launch {
                 history.delete(event.item.id)
@@ -80,21 +98,21 @@ class HistoryViewModel @Inject constructor(
             HistoryEvent.ExportAll -> export(limit = null)
             HistoryEvent.ExportLatest -> export(limit = FREE_EXPORT_LIMIT)
             HistoryEvent.WatchVideoToExport -> {
-                controls.update { it.copy(exportSheetCount = null) }
+                updateControls { it.copy(exportSheetCount = null) }
                 _effects.trySend(HistoryEffect.ShowRewardedThenExport)
             }
-            HistoryEvent.DismissExport -> controls.update { it.copy(exportSheetCount = null) }
+            HistoryEvent.DismissExport -> updateControls { it.copy(exportSheetCount = null) }
         }
     }
 
     private fun onExportClicked() {
         val total = state.value.totalCount
         if (total == 0) return
-        if (total <= FREE_EXPORT_LIMIT) export(limit = null) else controls.update { it.copy(exportSheetCount = total) }
+        if (total <= FREE_EXPORT_LIMIT) export(limit = null) else updateControls { it.copy(exportSheetCount = total) }
     }
 
     private fun export(limit: Int?) {
-        controls.update { it.copy(exportSheetCount = null) }
+        updateControls { it.copy(exportSheetCount = null) }
         viewModelScope.launch {
             val all = history.all()
             val rows = if (limit == null) all else all.take(limit)
@@ -105,6 +123,10 @@ class HistoryViewModel @Inject constructor(
 
     companion object {
         const val FREE_EXPORT_LIMIT = 50
+        private const val TAB_KEY = "tab"
+        private const val FILTER_KEY = "filter"
+        private const val QUERY_KEY = "query"
+        private const val SEARCHING_KEY = "searching"
         private const val STOP_TIMEOUT_MS = 5_000L
 
         fun List<HistoryItem>.applyControls(filter: HistoryFilter, query: String): List<HistoryItem> {

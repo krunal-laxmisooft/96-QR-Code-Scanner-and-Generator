@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.core.content.FileProvider
 import java.io.File
 
@@ -50,11 +51,11 @@ object Sharing {
     }
 
     fun openUrl(context: Context, url: String): Boolean = runCatching {
-        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }.isSuccess
 
     fun sendFeedback(context: Context, email: String, subject: String): Boolean = runCatching {
-        val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:")).apply {
+        val intent = Intent(Intent.ACTION_SENDTO, "mailto:".toUri()).apply {
             putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
             putExtra(Intent.EXTRA_SUBJECT, subject)
         }

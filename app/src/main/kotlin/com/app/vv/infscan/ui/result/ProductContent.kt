@@ -19,8 +19,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.app.vv.infscan.R
@@ -65,7 +67,7 @@ fun ProductContent(item: HistoryItem, parsed: ParsedCode.Product, state: ResultU
                     Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
                         Text(stringResource(if (tab == ProductTab.DETAILS) R.string.product_tab_details else R.string.product_tab_prices), style = InfTheme.type.tab, color = if (on) c.primary else c.inkSecondary)
                     }
-                    Box(Modifier.fillMaxWidth().height(3.dp).background(if (on) c.primary else androidx.compose.ui.graphics.Color.Transparent))
+                    Box(Modifier.fillMaxWidth().height(3.dp).background(if (on) c.primary else Color.Transparent))
                 }
             }
         }
@@ -152,7 +154,7 @@ private fun PricesList(offers: List<PriceOffer>, onEvent: (ResultEvent) -> Unit)
                         if (offer.isBest) {
                             Text(
                                 stringResource(R.string.prices_best),
-                                style = InfTheme.type.caption.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold),
+                                style = InfTheme.type.caption.copy(fontWeight = FontWeight.ExtraBold),
                                 color = c.onAccent,
                                 modifier = Modifier.clip(Shapes.pill).background(c.accent).padding(horizontal = Space.sm, vertical = Space.xxs),
                             )
@@ -164,7 +166,7 @@ private fun PricesList(offers: List<PriceOffer>, onEvent: (ResultEvent) -> Unit)
             }
         }
     }
-    Text(stringResource(R.string.prices_footnote), style = InfTheme.type.caption.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Normal), color = c.inkSecondary)
+    Text(stringResource(R.string.prices_footnote), style = InfTheme.type.caption.copy(fontWeight = FontWeight.Normal), color = c.inkSecondary)
 }
 
 private fun formatPrice(offer: PriceOffer): String =

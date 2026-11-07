@@ -1,6 +1,7 @@
 package com.app.vv.infscan.ui.settings
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,11 +24,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.app.vv.infscan.BuildConfig
 import com.app.vv.infscan.R
 import com.app.vv.infscan.data.prefs.AppSettings
 import com.app.vv.infscan.data.prefs.ThemeMode
+import com.app.vv.infscan.ui.components.ButtonKind
+import com.app.vv.infscan.ui.components.InfButton
 import com.app.vv.infscan.ui.components.InfDialog
 import com.app.vv.infscan.ui.components.InfIcon
 import com.app.vv.infscan.ui.components.InfSwitch
@@ -69,7 +74,7 @@ fun SettingsScreen(
             })
             Header(R.string.settings_privacy, top = Space.xs)
             SettingRow(R.drawable.ic_history, stringResource(R.string.settings_keep_history), onClick = { onEvent(SettingsEvent.ChooseRetention) }, trailing = {
-                Text(retentionLabel(state.settings.retentionDays), style = InfTheme.type.chipLabel.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = c.primary)
+                Text(retentionLabel(state.settings.retentionDays), style = InfTheme.type.chipLabel.copy(fontWeight = FontWeight.Bold), color = c.primary)
             })
             SettingRow(R.drawable.ic_delete, stringResource(R.string.settings_clear_history), onClick = { onEvent(SettingsEvent.ClearRequested) }, trailing = {
                 InfIcon(R.drawable.ic_delete, null, tint = c.error, size = 22.dp)
@@ -110,7 +115,7 @@ private val Chevron: @Composable () -> Unit = {
 }
 
 @Composable
-private fun Header(@androidx.annotation.StringRes text: Int, top: androidx.compose.ui.unit.Dp = Space.xs) {
+private fun Header(@StringRes text: Int, top: Dp = Space.xs) {
     SectionHeader(stringResource(text), Modifier.padding(start = Space.screen, end = Space.screen, top = top))
 }
 
@@ -143,7 +148,7 @@ private fun SettingRow(
 
 @Composable
 private fun retentionLabel(days: Int): String =
-    if (days == AppSettings.KEEP_FOREVER) stringResource(R.string.retention_forever) else stringResource(R.string.retention_days, days)
+    if (days == AppSettings.KEEP_FOREVER) stringResource(R.string.retention_forever) else pluralStringResource(R.plurals.retention_days, days, days)
 
 private fun ThemeMode.label(): Int = when (this) {
     ThemeMode.SYSTEM -> R.string.theme_system
@@ -173,7 +178,7 @@ private fun RetentionDialog(current: Int, onEvent: (SettingsEvent) -> Unit) {
             }
         },
         confirmButton = {
-            com.app.vv.infscan.ui.components.InfButton(stringResource(R.string.action_cancel), { onEvent(SettingsEvent.DismissRetention) }, kind = com.app.vv.infscan.ui.components.ButtonKind.Text, height = 48.dp, fillWidth = false)
+            InfButton(stringResource(R.string.action_cancel), { onEvent(SettingsEvent.DismissRetention) }, kind = ButtonKind.Text, height = 48.dp, fillWidth = false)
         },
     )
 }

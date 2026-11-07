@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -27,6 +28,7 @@ import com.app.vv.infscan.ui.components.InfSnackbarHost
 @Composable
 fun HistoryRoute(onOpen: (Long) -> Unit, onScan: () -> Unit, viewModel: HistoryViewModel = hiltViewModel()) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val ads = LocalAdManager.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
@@ -35,10 +37,10 @@ fun HistoryRoute(onOpen: (Long) -> Unit, onScan: () -> Unit, viewModel: HistoryV
         viewModel.effects.collect { effect ->
             when (effect) {
                 is HistoryEffect.Deleted -> {
-                    val result = snackbar.showSnackbar(context.getString(R.string.history_deleted), context.getString(R.string.action_undo))
+                    val result = snackbar.showSnackbar(resources.getString(R.string.history_deleted), resources.getString(R.string.action_undo))
                     if (result == SnackbarResult.ActionPerformed) viewModel.onEvent(HistoryEvent.Restore(effect.item))
                 }
-                is HistoryEffect.ShareCsv -> Sharing.shareCsv(context, effect.csv, context.getString(R.string.share_chooser))
+                is HistoryEffect.ShareCsv -> Sharing.shareCsv(context, effect.csv, resources.getString(R.string.share_chooser))
                 HistoryEffect.ShowRewardedThenExport -> {
                     val activity = context.findActivity()
                     if (ads != null && activity != null && ads.isRewardedReady()) {

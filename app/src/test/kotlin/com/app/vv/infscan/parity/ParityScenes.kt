@@ -26,10 +26,9 @@ import com.app.vv.infscan.R
 import com.app.vv.infscan.domain.create.CreateType
 import com.app.vv.infscan.domain.create.FormField
 import com.app.vv.infscan.domain.create.FormValues
-import com.app.vv.infscan.domain.model.CodeFormat
-import com.app.vv.infscan.domain.model.HistoryKind
 import com.app.vv.infscan.domain.model.ParsedCode
 import com.app.vv.infscan.platform.QrEncoder
+import com.app.vv.infscan.ui.preview.PreviewData as Samples
 import com.app.vv.infscan.ui.components.AdBannerFrame
 import com.app.vv.infscan.ui.components.InfBottomNav
 import com.app.vv.infscan.ui.components.InfDialogContent

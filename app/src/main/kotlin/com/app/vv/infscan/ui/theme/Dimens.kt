@@ -14,7 +14,6 @@ object Space {
     val fieldGap = 22.dp
     val xl = 24.dp
     val xxl = 32.dp
-    val huge = 48.dp
 }
 
 object Radius {
@@ -40,7 +39,6 @@ object Sizes {
     val topBar = 56.dp
     val bottomNav = 72.dp
     val button = 52.dp
-    val buttonCompact = 44.dp
     val iconSmall = 18.dp
     val icon = 24.dp
     val avatar = 40.dp

@@ -1,20 +1,16 @@
 package com.app.vv.infscan.ui.components
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.background
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Switch
@@ -25,14 +21,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.app.vv.infscan.ui.theme.InfTheme
 import com.app.vv.infscan.ui.theme.Shapes
 import com.app.vv.infscan.ui.theme.Sizes
-import com.app.vv.infscan.ui.theme.Space
 
 @Composable
 fun InfTextField(
@@ -115,7 +110,7 @@ fun <T> SegmentedControl(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(44.dp)
+            .height(Sizes.touch)
             .clip(Shapes.pill)
             .border(BorderStroke(1.5.dp, c.inkSecondary), Shapes.pill)
             .selectableGroup(),
@@ -126,13 +121,13 @@ fun <T> SegmentedControl(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .height(44.dp)
+                    .height(Sizes.touch)
                     .background(if (on) c.soft else Color.Transparent)
                     .selectable(selected = on, role = Role.RadioButton, onClick = { onSelect(option) }),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(label(option), style = InfTheme.type.chipLabel.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = if (on) c.onSoft else c.ink)
+                Text(label(option), style = InfTheme.type.chipLabel.copy(fontWeight = FontWeight.Bold), color = if (on) c.onSoft else c.ink)
             }
         }
     }

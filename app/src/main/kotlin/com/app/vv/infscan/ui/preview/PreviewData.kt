@@ -1,4 +1,4 @@
-package com.app.vv.infscan.parity
+package com.app.vv.infscan.ui.preview
 
 import com.app.vv.infscan.core.FailureReason
 import com.app.vv.infscan.data.prefs.AppSettings
@@ -24,8 +24,8 @@ import com.app.vv.infscan.ui.settings.SettingsUiState
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-/** Sample data that matches the design canvas copy. */
-object Samples {
+/** Sample state that matches the design canvas copy, used by previews and by the screenshot tests. */
+object PreviewData {
     val now: Long = LocalDateTime.of(2026, 11, 7, 10, 50).toInstant(ZoneOffset.UTC).toEpochMilli()
     private fun ago(hours: Int, minutes: Int = 0) = now - (hours * 60L + minutes) * 60_000L
 

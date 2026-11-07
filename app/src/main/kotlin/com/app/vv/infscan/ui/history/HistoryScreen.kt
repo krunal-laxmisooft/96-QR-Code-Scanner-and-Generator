@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,11 +30,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.app.vv.infscan.R
@@ -52,6 +57,10 @@ import com.app.vv.infscan.ui.theme.InfTheme
 import com.app.vv.infscan.ui.theme.Space
 
 private const val NATIVE_AD_INTERVAL = 8
+private const val AD_CONTENT_TYPE = "ad"
+private const val ROW_CONTENT_TYPE = "row"
+
+private fun isAdPosition(position: Int) = (position + 1) % (NATIVE_AD_INTERVAL + 1) == 0
 
 @Composable
 fun HistoryScreen(
@@ -69,7 +78,9 @@ fun HistoryScreen(
         if (fullyEmpty) {
             InfTopBar(stringResource(R.string.tab_history))
             EmptyHistory(HistoryKind.SCANNED, onScan, Modifier.weight(1f))
-        } else if (state.searching) {
+            return@Column
+        }
+        if (state.searching) {
             Row(Modifier.padding(horizontal = Space.xs).height(72.dp), verticalAlignment = Alignment.CenterVertically) {
                 InfIconButton(R.drawable.ic_back, stringResource(R.string.history_close_search), { onEvent(HistoryEvent.ToggleSearch) })
                 InfTextField(stringResource(R.string.history_search_hint), state.query, { onEvent(HistoryEvent.QueryChanged(it)) }, Modifier.weight(1f).padding(end = Space.md))
@@ -83,10 +94,8 @@ fun HistoryScreen(
                 },
             )
         }
-        if (!fullyEmpty) Tabs(state.tab, onEvent)
-        if (fullyEmpty) {
-            Unit
-        } else if (state.items.isEmpty() && !state.loading && !state.isFiltered) {
+        Tabs(state.tab, onEvent)
+        if (state.items.isEmpty() && !state.loading && !state.isFiltered) {
             EmptyHistory(state.tab, onScan, Modifier.weight(1f))
         } else {
             Filters(state, onEvent)
@@ -115,7 +124,7 @@ private fun Tabs(selected: HistoryKind, onEvent: (HistoryEvent) -> Unit) {
                 Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
                     Text(stringResource(label), style = InfTheme.type.tab, color = if (on) c.primary else c.inkSecondary)
                 }
-                Box(Modifier.fillMaxWidth().height(3.dp).background(if (on) c.primary else androidx.compose.ui.graphics.Color.Transparent))
+                Box(Modifier.fillMaxWidth().height(3.dp).background(if (on) c.primary else Color.Transparent))
             }
         }
     }
@@ -128,7 +137,7 @@ private fun Filters(state: HistoryUiState, onEvent: (HistoryEvent) -> Unit) {
         HistoryFilter.ALL to R.string.filter_all, HistoryFilter.LINKS to R.string.filter_links,
         HistoryFilter.WIFI to R.string.filter_wifi, HistoryFilter.PRODUCTS to R.string.filter_products,
     )
-    Row(Modifier.padding(horizontal = Space.screen, vertical = Space.md), horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
+    Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = Space.screen, vertical = Space.sm - 2.dp), horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
         HistoryFilter.entries.forEach { filter ->
             InfChip(stringResource(labels.getValue(filter)), state.filter == filter, { onEvent(HistoryEvent.SelectFilter(filter)) })
         }
@@ -139,9 +148,13 @@ private fun Filters(state: HistoryUiState, onEvent: (HistoryEvent) -> Unit) {
 private fun HistoryList(state: HistoryUiState, onEvent: (HistoryEvent) -> Unit, onOpen: (HistoryItem) -> Unit, nativeAd: @Composable () -> Unit, modifier: Modifier) {
     val listState = rememberLazyListState()
     LazyColumn(modifier, state = listState) {
-        items(state.items.size + state.items.size / NATIVE_AD_INTERVAL, key = { position -> rowKey(state.items, position) }) { position ->
+        items(
+            count = state.items.size + state.items.size / NATIVE_AD_INTERVAL,
+            key = { position -> rowKey(state.items, position) },
+            contentType = { position -> if (isAdPosition(position)) AD_CONTENT_TYPE else ROW_CONTENT_TYPE },
+        ) { position ->
             val itemIndex = position - position / (NATIVE_AD_INTERVAL + 1)
-            if ((position + 1) % (NATIVE_AD_INTERVAL + 1) == 0) {
+            if (isAdPosition(position)) {
                 Box(Modifier.padding(horizontal = Space.screen, vertical = Space.sm)) { nativeAd() }
             } else {
                 HistoryRow(state.items[itemIndex], state.now, onEvent, onOpen)
@@ -151,7 +164,7 @@ private fun HistoryList(state: HistoryUiState, onEvent: (HistoryEvent) -> Unit, 
 }
 
 private fun rowKey(items: List<HistoryItem>, position: Int): Any {
-    val isAd = (position + 1) % (NATIVE_AD_INTERVAL + 1) == 0
+    val isAd = isAdPosition(position)
     val itemIndex = position - position / (NATIVE_AD_INTERVAL + 1)
     return if (isAd) "ad-$position" else items[itemIndex].id
 }
@@ -182,7 +195,7 @@ private fun HistoryRow(item: HistoryItem, now: Long, onEvent: (HistoryEvent) -> 
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .height(64.dp)
+                    .heightIn(min = 64.dp)
                     .clickable(role = Role.Button) { onOpen(item) }
                     .semantics { customActions = listOf(CustomAccessibilityAction(deleteLabel) { onEvent(HistoryEvent.Delete(item)); true }) }
                     .padding(start = Space.screen, end = Space.xs),
@@ -223,7 +236,7 @@ private fun EmptyHistory(tab: HistoryKind, onScan: () -> Unit, modifier: Modifie
             stringResource(if (tab == HistoryKind.SCANNED) R.string.history_empty_body else R.string.history_empty_created_body),
             style = InfTheme.type.bodyLarge.copy(lineHeight = InfTheme.type.bodyLarge.fontSize * 1.5f),
             color = c.inkSecondary,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            textAlign = TextAlign.Center,
         )
         Box(Modifier.fillMaxWidth().padding(top = Space.sm)) { InfButton(stringResource(R.string.history_scan_a_code), onScan, icon = R.drawable.ic_scan) }
     }

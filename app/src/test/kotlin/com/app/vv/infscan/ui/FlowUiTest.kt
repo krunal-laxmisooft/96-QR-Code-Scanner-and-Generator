@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.test.core.app.ApplicationProvider
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onLast
@@ -18,7 +18,7 @@ import com.app.vv.infscan.domain.create.CreateType
 import com.app.vv.infscan.domain.create.FormField
 import com.app.vv.infscan.domain.model.CodeKind
 import com.app.vv.infscan.domain.model.HistoryKind
-import com.app.vv.infscan.parity.Samples
+import com.app.vv.infscan.ui.preview.PreviewData as Samples
 import com.app.vv.infscan.ui.create.CreateFormEvent
 import com.app.vv.infscan.ui.create.CreateFormScreen
 import com.app.vv.infscan.ui.create.CreateFormUiState

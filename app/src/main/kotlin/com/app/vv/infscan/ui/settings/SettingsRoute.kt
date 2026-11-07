@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.app.vv.infscan.BuildConfig
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsRoute(viewModel: SettingsViewModel = hiltViewModel()) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val ads = LocalAdManager.current
     val scope = rememberCoroutineScope()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -37,7 +39,7 @@ fun SettingsRoute(viewModel: SettingsViewModel = hiltViewModel()) {
             }
         },
         onFeedback = {
-            Sharing.sendFeedback(context, BuildConfig.FEEDBACK_EMAIL, context.getString(R.string.settings_feedback_subject, BuildConfig.VERSION_NAME))
+            Sharing.sendFeedback(context, BuildConfig.FEEDBACK_EMAIL, resources.getString(R.string.settings_feedback_subject, BuildConfig.VERSION_NAME))
         },
     )
 }

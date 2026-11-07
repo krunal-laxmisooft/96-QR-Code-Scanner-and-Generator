@@ -28,7 +28,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -48,6 +47,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -66,6 +66,7 @@ import com.app.vv.infscan.ui.components.InfTopBar
 import com.app.vv.infscan.ui.components.IconCircle
 import com.app.vv.infscan.ui.theme.InfTheme
 import com.app.vv.infscan.ui.theme.Shapes
+import com.app.vv.infscan.ui.theme.Sizes
 import com.app.vv.infscan.ui.theme.Space
 
 private val FrameSize = 214.dp
@@ -224,13 +225,13 @@ private fun BottomControls(state: ScanUiState, onEvent: (ScanEvent) -> Unit, onP
         verticalAlignment = Alignment.CenterVertically,
     ) {
         InfIconButton(R.drawable.ic_image, stringResource(R.string.scan_from_photo), onPickImage, tint = c.onCamera, background = c.cameraGlass, size = 52.dp)
-        Row(Modifier.height(52.dp).clip(Shapes.pill).background(c.cameraGlass).padding(4.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(Modifier.height(56.dp).clip(Shapes.pill).background(c.cameraGlass).padding(4.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             listOf(ScanMode.SCAN to R.string.scan_mode_scan, ScanMode.BATCH to R.string.scan_mode_batch).forEach { (mode, label) ->
                 val on = state.mode == mode
                 Box(
                     Modifier
                         .width(96.dp)
-                        .height(44.dp)
+                        .height(Sizes.touch)
                         .clip(Shapes.pill)
                         .background(if (on) c.onCamera else Color.Transparent)
                         .selectable(selected = on, role = Role.Tab, onClick = { onEvent(ScanEvent.ModeSelected(mode)) }),
@@ -257,7 +258,7 @@ private fun BatchPanel(state: ScanUiState, onEvent: (ScanEvent) -> Unit, modifie
     ) {
         Box(Modifier.align(Alignment.CenterHorizontally).size(36.dp, 4.dp).clip(Shapes.pill).background(c.outline))
         Row(Modifier.height(48.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
-            Text(stringResource(R.string.scan_batch_title, state.batch.size), style = InfTheme.type.titleSmall, color = c.ink, modifier = Modifier.weight(1f))
+            Text(pluralStringResource(R.plurals.scan_batch_title, state.batch.size, state.batch.size), style = InfTheme.type.titleSmall, color = c.ink, modifier = Modifier.weight(1f))
             if (state.batch.isNotEmpty()) {
                 InfButton(stringResource(R.string.scan_batch_csv), { onEvent(ScanEvent.ExportBatch) }, kind = ButtonKind.Tonal, icon = R.drawable.ic_download, height = 40.dp, fillWidth = false, horizontalPadding = 14.dp)
             }
@@ -269,7 +270,7 @@ private fun BatchPanel(state: ScanUiState, onEvent: (ScanEvent) -> Unit, modifie
             LazyColumn(Modifier.heightIn(max = 232.dp)) {
                 items(state.batch, key = { it.id }) { entry ->
                     HorizontalDivider(color = c.outline)
-                    Row(Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Space.md)) {
+                    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Space.md)) {
                         IconCircle(entry.kind.icon())
                         Column(Modifier.weight(1f)) {
                             Text(entry.value, style = InfTheme.type.mono, color = c.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)

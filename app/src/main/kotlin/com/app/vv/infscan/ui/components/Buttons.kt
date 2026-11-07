@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.Surface
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -65,8 +65,8 @@ fun InfButton(
         border = border,
         modifier = modifier
             .then(if (fillWidth) Modifier.fillMaxWidth() else Modifier)
-            .height(height)
-            .sizeIn(minWidth = Sizes.touch),
+            .minimumInteractiveComponentSize()
+            .height(height),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = if (fillWidth) 0.dp else horizontalPadding),

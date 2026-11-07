@@ -9,14 +9,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.app.vv.infscan.R
 import com.app.vv.infscan.platform.QrEncoder
@@ -67,7 +68,7 @@ fun ScanIllustration(modifier: Modifier = Modifier) {
                 val (cx, cy) = pos
                 val sx = if (which == 2 || which == 3) -1f else 1f
                 val sy = if (which == 3 || which == 4) -1f else 1f
-                val p = androidx.compose.ui.graphics.Path().apply {
+                val p = Path().apply {
                     moveTo(cx * d, (cy + sy * corner) * d)
                     lineTo(cx * d, (cy + sy * 4f) * d)
                     quadraticTo(cx * d, cy * d, (cx + sx * 4f) * d, cy * d)
@@ -155,7 +156,7 @@ fun EmptyHistoryIllustration(modifier: Modifier = Modifier) {
         qr("InfScan empty", 74f, 50f, 52f, c.inkSecondary, c.surface)
         rr(72f, 106f, 56f, 5f, 2.5f, c.outline)
         listOf(Triple(58f, 30f, 1f), Triple(142f, 30f, -1f)).forEach { (x, y, sx) ->
-            val p = androidx.compose.ui.graphics.Path().apply {
+            val p = Path().apply {
                 moveTo(x * d, y * d)
                 lineTo(x * d, (y - 8) * d)
                 quadraticTo(x * d, (y - 14) * d, (x + sx * 6) * d, (y - 14) * d)

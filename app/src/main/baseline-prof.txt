@@ -1,0 +1,17 @@
+# Startup and first-scan path, compiled ahead of time through ProfileInstaller.
+HSPLcom/app/vv/infscan/InfScanApp;-><init>()V
+HSPLcom/app/vv/infscan/InfScanApp;->onCreate()V
+HSPLcom/app/vv/infscan/MainActivity;->**(**)**
+HSPLcom/app/vv/infscan/MainViewModel;->**(**)**
+HSPLcom/app/vv/infscan/ui/nav/**;->**(**)**
+HSPLcom/app/vv/infscan/ui/theme/**;->**(**)**
+HSPLcom/app/vv/infscan/ui/components/**;->**(**)**
+HSPLcom/app/vv/infscan/ui/scan/**;->**(**)**
+HSPLcom/app/vv/infscan/ui/result/**;->**(**)**
+HSPLcom/app/vv/infscan/ui/history/**;->**(**)**
+HSPLcom/app/vv/infscan/domain/parser/**;->**(**)**
+HSPLcom/app/vv/infscan/data/db/**;->**(**)**
+HSPLcom/app/vv/infscan/data/prefs/**;->**(**)**
+Lcom/app/vv/infscan/ui/theme/**;
+Lcom/app/vv/infscan/ui/nav/**;
+Lcom/app/vv/infscan/ui/scan/**;

@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -60,6 +61,7 @@ private const val QUIET_ZONE_MODULES = 2
 @Composable
 fun CreatePreviewRoute(onBack: () -> Unit, viewModel: CreatePreviewViewModel = hiltViewModel()) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val adManager = LocalAdManager.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
@@ -69,23 +71,23 @@ fun CreatePreviewRoute(onBack: () -> Unit, viewModel: CreatePreviewViewModel = h
 
     LaunchedEffect(state.item?.id) {
         if (state.item == null) return@LaunchedEffect
-        val result = snackbar.showSnackbar(context.getString(R.string.create_saved_history), context.getString(R.string.action_undo))
+        val result = snackbar.showSnackbar(resources.getString(R.string.create_saved_history), resources.getString(R.string.action_undo))
         if (result == SnackbarResult.ActionPerformed) viewModel.onEvent(CreatePreviewEvent.Undo)
     }
     LaunchedEffect(viewModel) {
         viewModel.effects.collect { effect ->
             when (effect) {
                 CreatePreviewEffect.Saved -> {
-                    snackbar.showSnackbar(context.getString(R.string.create_saved_gallery))
+                    snackbar.showSnackbar(resources.getString(R.string.create_saved_gallery))
                     val activity = context.findActivity()
                     if (activity != null) adManager?.showInterstitial(activity, AdPlacement.INTERSTITIAL_CREATE_DONE) {}
                 }
-                is CreatePreviewEffect.ShareImage -> Sharing.shareImage(context, effect.bitmap, effect.name, context.getString(R.string.share_chooser))
+                is CreatePreviewEffect.ShareImage -> Sharing.shareImage(context, effect.bitmap, effect.name, resources.getString(R.string.share_chooser))
                 is CreatePreviewEffect.CopyText -> {
-                    Sharing.copy(context, context.getString(R.string.app_name), effect.text)
-                    snackbar.showSnackbar(context.getString(R.string.result_copied))
+                    Sharing.copy(context, resources.getString(R.string.app_name), effect.text)
+                    snackbar.showSnackbar(resources.getString(R.string.result_copied))
                 }
-                is CreatePreviewEffect.Message -> snackbar.showSnackbar(context.getString(effect.text))
+                is CreatePreviewEffect.Message -> snackbar.showSnackbar(resources.getString(effect.text))
                 CreatePreviewEffect.Closed -> onBack()
             }
         }

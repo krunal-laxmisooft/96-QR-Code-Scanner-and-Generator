@@ -1,14 +1,17 @@
 package com.app.vv.infscan.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,15 +21,16 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.app.vv.infscan.R
 import com.app.vv.infscan.ui.theme.InfTheme
 import com.app.vv.infscan.ui.theme.Shapes
 import com.app.vv.infscan.ui.theme.Sizes
 import com.app.vv.infscan.ui.theme.Space
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.res.stringResource
 
 /** Reserved space shown while a banner loads, and used for design previews. */
 @Composable
@@ -54,7 +58,7 @@ fun AdBannerFrame(modifier: Modifier = Modifier, text: String? = null, content: 
                 Text(text, style = InfTheme.type.chipLabel.copy(fontSize = InfTheme.type.bodySmall.fontSize), color = c.inkSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                 Text(
                     stringResource(R.string.ad_shop),
-                    style = InfTheme.type.caption.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
+                    style = InfTheme.type.caption.copy(fontWeight = FontWeight.Bold),
                     color = c.onSoft,
                     modifier = Modifier.clip(RoundedCornerShape(12.dp)).background(c.soft).padding(horizontal = 10.dp, vertical = 6.dp),
                 )
@@ -81,17 +85,17 @@ fun NativeAdCardFrame(
             .fillMaxWidth()
             .clip(Shapes.card)
             .background(c.surface)
-            .androidxBorder(c.outline)
+            .border(1.dp, c.outline, Shapes.card)
             .padding(Space.md),
         horizontalArrangement = Arrangement.spacedBy(Space.md),
     ) {
         Box(Modifier.size(72.dp).clip(RoundedCornerShape(12.dp)).background(c.surfaceVariant), contentAlignment = Alignment.Center) { media() }
-        androidx.compose.foundation.layout.Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Space.xxs)) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Space.xxs)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
                 AdLabel()
                 Text(advertiser, style = InfTheme.type.caption, color = c.inkSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            Text(headline, style = InfTheme.type.rowTitle.copy(fontSize = androidx.compose.ui.unit.TextUnit(15f, androidx.compose.ui.unit.TextUnitType.Sp), lineHeight = androidx.compose.ui.unit.TextUnit(19f, androidx.compose.ui.unit.TextUnitType.Sp), fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = c.ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(headline, style = InfTheme.type.rowTitle.copy(fontSize = 15.sp, lineHeight = 19.sp, fontWeight = FontWeight.Bold), color = c.ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Text(body, style = InfTheme.type.bodySmall, color = c.inkSecondary, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Box(
                 Modifier
@@ -101,12 +105,7 @@ fun NativeAdCardFrame(
                     .background(c.soft)
                     .padding(horizontal = Space.lg),
                 contentAlignment = Alignment.Center,
-            ) { Text(callToAction, style = InfTheme.type.chipLabel.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = c.onSoft) }
+            ) { Text(callToAction, style = InfTheme.type.chipLabel.copy(fontWeight = FontWeight.Bold), color = c.onSoft) }
         }
     }
 }
-
-private fun Modifier.androidxBorder(color: androidx.compose.ui.graphics.Color): Modifier =
-    this.then(Modifier.drawBehind {
-        drawRoundRect(color, cornerRadius = CornerRadius(16.dp.toPx()), style = Stroke(1.dp.toPx()))
-    })

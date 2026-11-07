@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import androidx.core.net.toUri
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -22,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -39,6 +41,7 @@ fun ScanRoute(
     viewModel: ScanViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val activity = context.findActivity()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
@@ -71,8 +74,8 @@ fun ScanRoute(
             when (effect) {
                 is ScanEffect.OpenResult -> onOpenResult(effect.id)
                 is ScanEffect.OpenUrl -> Sharing.openUrl(context, effect.url)
-                is ScanEffect.Message -> snackbar.showSnackbar(context.getString(effect.text))
-                is ScanEffect.ShareCsv -> Sharing.shareCsv(context, effect.csv, context.getString(R.string.share_chooser))
+                is ScanEffect.Message -> snackbar.showSnackbar(resources.getString(effect.text))
+                is ScanEffect.ShareCsv -> Sharing.shareCsv(context, effect.csv, resources.getString(R.string.share_chooser))
                 ScanEffect.OpenHistory -> onOpenHistory()
             }
         }
@@ -84,7 +87,7 @@ fun ScanRoute(
             onEvent = viewModel::onEvent,
             onRequestAccess = { permissionLauncher.launch(Manifest.permission.CAMERA) },
             onOpenSettings = {
-                context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}")))
+                context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, "package:${context.packageName}".toUri()))
             },
             onPickImage = { photoLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
         ) {

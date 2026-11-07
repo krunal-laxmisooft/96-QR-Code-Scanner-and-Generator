@@ -76,5 +76,4 @@ sealed interface ResultEffect {
     data class ShareText(val text: String) : ResultEffect
     data class CopyText(val text: String, @StringRes val message: Int) : ResultEffect
     data object Close : ResultEffect
-    data class Message(@StringRes val text: Int) : ResultEffect
 }

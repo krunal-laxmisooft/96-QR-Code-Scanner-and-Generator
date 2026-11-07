@@ -18,17 +18,18 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.viewinterop.AndroidView
 import com.app.vv.infscan.BuildConfig
+import com.app.vv.infscan.R
 import com.app.vv.infscan.analytics.AnalyticsTracker
 import com.app.vv.infscan.ui.components.AdBannerFrame
 import com.app.vv.infscan.ui.theme.InfColors
@@ -184,7 +185,7 @@ private fun buildNativeView(ctx: Context, c: InfColors): NativeAdView {
     }
     val top = LinearLayout(ctx).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
     val badge = text(ctx, 10f, c.onAccent.toArgb(), bold = true).apply {
-        this.text = ctx.getString(com.app.vv.infscan.R.string.ad_label)
+        this.text = ctx.getString(R.string.ad_label)
         setPadding(ctx.dp(6), ctx.dp(2), ctx.dp(6), ctx.dp(2))
         background = roundedBackground(ctx, c.accent.toArgb(), 4)
     }

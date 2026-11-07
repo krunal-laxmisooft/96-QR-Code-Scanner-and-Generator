@@ -1,7 +1,7 @@
 package com.app.vv.infscan.platform
 
 import android.content.Context
-import android.net.Uri
+import androidx.core.net.toUri
 import com.app.vv.infscan.domain.model.DetectedCode
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -23,7 +23,7 @@ class MlKitBarcodeImageDecoder @Inject constructor(
 ) : BarcodeImageDecoder {
 
     override suspend fun decode(uri: String): List<DetectedCode> {
-        val image = runCatching { InputImage.fromFilePath(context, Uri.parse(uri)) }.getOrNull() ?: return emptyList()
+        val image = runCatching { InputImage.fromFilePath(context, uri.toUri()) }.getOrNull() ?: return emptyList()
         val scanner = BarcodeScanning.getClient(BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS).build())
         return try {
             suspendCancellableCoroutine { cont ->

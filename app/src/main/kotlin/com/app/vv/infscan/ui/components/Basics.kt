@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -141,7 +142,7 @@ fun InfChip(
         color = container,
         contentColor = content,
         border = if (selected) null else BorderStroke(1.dp, c.outline),
-        modifier = modifier.height(Sizes.chip),
+        modifier = modifier.minimumInteractiveComponentSize().height(Sizes.chip),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = Space.md),

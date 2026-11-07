@@ -55,7 +55,6 @@
     <string name="scan_open_settings">Open settings</string>
     <string name="scan_allow_camera">Allow camera</string>
     <string name="scan_photo_instead">Scan from a photo instead</string>
-    <string name="scan_batch_title">Batch · %1$d scanned</string>
     <string name="scan_batch_csv">CSV</string>
     <string name="scan_batch_done">Done</string>
     <string name="scan_batch_empty">Point the camera at codes to add them to this batch.</string>
@@ -223,7 +222,6 @@
     <string name="filter_wifi">Wi-Fi</string>
     <string name="filter_products">Products</string>
     <string name="export_title">Export your history</string>
-    <string name="export_body">Watch a short video to export all %1$d items as a CSV file. Or export the latest %2$d now, no video needed.</string>
     <string name="export_watch">Watch video, export all</string>
     <string name="export_latest">Export latest %1$d</string>
     <string name="export_optional">The video is optional and plays only after you tap.</string>
@@ -241,7 +239,6 @@
     <string name="settings_open_links">Open links without asking</string>
     <string name="settings_open_links_hint">Off is safer. You always see the address first.</string>
     <string name="settings_keep_history">Keep history</string>
-    <string name="retention_days">%1$d days</string>
     <string name="retention_forever">Forever</string>
     <string name="settings_clear_history">Clear history</string>
     <string name="settings_ad_choices">Ad choices</string>
@@ -256,6 +253,18 @@
     <string name="clear_title">Clear all history?</string>
     <string name="clear_body">This removes %1$s and %2$s from this device, favorites included. You can’t undo it.</string>
     <string name="clear_confirm">Clear history</string>
+    <plurals name="scan_batch_title">
+        <item quantity="one">Batch · %1$d scanned</item>
+        <item quantity="other">Batch · %1$d scanned</item>
+    </plurals>
+    <plurals name="retention_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <plurals name="export_body">
+        <item quantity="one">Watch a short video to export %1$d item as a CSV file. Or export the latest %2$d now, no video needed.</item>
+        <item quantity="other">Watch a short video to export all %1$d items as a CSV file. Or export the latest %2$d now, no video needed.</item>
+    </plurals>
     <plurals name="count_scans">
         <item quantity="one">%1$d scan</item>
         <item quantity="other">%1$d scans</item>
