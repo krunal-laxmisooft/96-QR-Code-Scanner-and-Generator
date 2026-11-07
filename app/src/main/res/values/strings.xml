@@ -119,6 +119,7 @@
     <string name="product_code">%1$s %2$s</string>
     <string name="product_tab_details">Details</string>
     <string name="product_tab_prices">Prices</string>
+    <string name="product_source">Product data from Open Food Facts.</string>
     <string name="product_details_missing">No product details were found for this barcode.</string>
     <string name="product_details_offline">You’re offline, so product details can’t load.</string>
     <string name="prices_lowest">Lowest nearby</string>

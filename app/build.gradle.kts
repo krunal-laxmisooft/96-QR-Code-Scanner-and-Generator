@@ -29,7 +29,7 @@ android {
         applicationId = "com.app.vv.infscan"
         minSdk = 26
         targetSdk = 37
-        versionCode = 1
+        versionCode = 10000
         versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         androidResources.localeFilters += listOf("en")

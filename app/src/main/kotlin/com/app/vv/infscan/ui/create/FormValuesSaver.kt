@@ -1,7 +1,6 @@
 package com.app.vv.infscan.ui.create
 
 import android.os.Bundle
-import androidx.core.os.bundleOf
 import com.app.vv.infscan.domain.create.FormField
 import com.app.vv.infscan.domain.create.FormValues
 import com.app.vv.infscan.domain.model.WifiSecurity
@@ -15,7 +14,8 @@ object FormValuesSaver {
 
     fun save(values: FormValues): Bundle = Bundle().apply {
         values.text.forEach { (field, text) -> putString(field.name, text) }
-        putAll(bundleOf(SECURITY to values.security.name, HIDDEN to values.hidden))
+        putString(SECURITY, values.security.name)
+        putBoolean(HIDDEN, values.hidden)
         values.startMillis?.let { putLong(START, it) }
         values.endMillis?.let { putLong(END, it) }
     }

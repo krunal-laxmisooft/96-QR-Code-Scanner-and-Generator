@@ -86,6 +86,12 @@ private fun DetailsTab(details: DetailsState, code: String) {
             if (details.info.brand.isNotBlank()) DetailRow(stringResource(R.string.field_brand), details.info.brand)
             if (details.info.quantity.isNotBlank()) DetailRow(stringResource(R.string.field_quantity), details.info.quantity)
             DetailRow(stringResource(R.string.field_barcode), code, mono = true)
+            Text(
+                stringResource(R.string.product_source),
+                style = InfTheme.type.caption.copy(fontWeight = FontWeight.Normal),
+                color = c.inkSecondary,
+                modifier = Modifier.padding(top = Space.sm),
+            )
         }
         is DetailsState.Failed -> Text(
             stringResource(if (details.reason == FailureReason.OFFLINE) R.string.product_details_offline else R.string.product_details_missing),
