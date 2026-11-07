@@ -79,7 +79,7 @@ fun CreateFormScreen(state: CreateFormUiState, onEvent: (CreateFormEvent) -> Uni
         )
         Column(
             Modifier.weight(1f).imePadding().verticalScroll(rememberScrollState()).padding(horizontal = Space.screen, vertical = Space.md),
-            verticalArrangement = Arrangement.spacedBy(Space.md),
+            verticalArrangement = Arrangement.spacedBy(Space.fieldGap),
         ) {
             when (state.type) {
                 CreateType.WIFI -> WifiFields(state, onEvent)

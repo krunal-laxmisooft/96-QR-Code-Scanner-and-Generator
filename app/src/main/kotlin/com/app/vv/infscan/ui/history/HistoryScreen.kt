@@ -64,8 +64,12 @@ fun HistoryScreen(
     modifier: Modifier = Modifier,
 ) {
     val c = InfTheme.colors
+    val fullyEmpty = state.totalCount == 0 && !state.loading
     Column(modifier.fillMaxSize().background(c.background)) {
-        if (state.searching) {
+        if (fullyEmpty) {
+            InfTopBar(stringResource(R.string.tab_history))
+            EmptyHistory(HistoryKind.SCANNED, onScan, Modifier.weight(1f))
+        } else if (state.searching) {
             Row(Modifier.padding(horizontal = Space.xs).height(72.dp), verticalAlignment = Alignment.CenterVertically) {
                 InfIconButton(R.drawable.ic_back, stringResource(R.string.history_close_search), { onEvent(HistoryEvent.ToggleSearch) })
                 InfTextField(stringResource(R.string.history_search_hint), state.query, { onEvent(HistoryEvent.QueryChanged(it)) }, Modifier.weight(1f).padding(end = Space.md))
@@ -79,9 +83,11 @@ fun HistoryScreen(
                 },
             )
         }
-        Tabs(state.tab, onEvent)
-        if (state.items.isEmpty() && !state.loading && !state.isFiltered) {
-            EmptyHistory(onScan, Modifier.weight(1f))
+        if (!fullyEmpty) Tabs(state.tab, onEvent)
+        if (fullyEmpty) {
+            Unit
+        } else if (state.items.isEmpty() && !state.loading && !state.isFiltered) {
+            EmptyHistory(state.tab, onScan, Modifier.weight(1f))
         } else {
             Filters(state, onEvent)
             if (state.items.isEmpty() && !state.loading) {
@@ -204,7 +210,7 @@ private fun HistoryRow(item: HistoryItem, now: Long, onEvent: (HistoryEvent) -> 
 }
 
 @Composable
-private fun EmptyHistory(onScan: () -> Unit, modifier: Modifier) {
+private fun EmptyHistory(tab: HistoryKind, onScan: () -> Unit, modifier: Modifier) {
     val c = InfTheme.colors
     Column(
         modifier.fillMaxWidth().padding(horizontal = 32.dp),
@@ -212,9 +218,9 @@ private fun EmptyHistory(onScan: () -> Unit, modifier: Modifier) {
         verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically),
     ) {
         EmptyHistoryIllustration()
-        Text(stringResource(R.string.history_empty_title), style = InfTheme.type.titleLarge.copy(fontSize = InfTheme.type.titleMedium.fontSize * 1.09f), color = c.ink)
+        Text(stringResource(if (tab == HistoryKind.SCANNED) R.string.history_empty_title else R.string.history_empty_created_title), style = InfTheme.type.titleLarge.copy(fontSize = InfTheme.type.titleMedium.fontSize * 1.09f), color = c.ink)
         Text(
-            stringResource(R.string.history_empty_body),
+            stringResource(if (tab == HistoryKind.SCANNED) R.string.history_empty_body else R.string.history_empty_created_body),
             style = InfTheme.type.bodyLarge.copy(lineHeight = InfTheme.type.bodyLarge.fontSize * 1.5f),
             color = c.inkSecondary,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,

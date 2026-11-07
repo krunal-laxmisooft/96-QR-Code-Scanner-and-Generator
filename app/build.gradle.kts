@@ -91,6 +91,19 @@ android {
         unitTests {
             isIncludeAndroidResources = true
             isReturnDefaultValues = true
+            all { test ->
+                test.jvmArgs(
+                    "--add-opens=java.base/java.lang=ALL-UNNAMED",
+                    "--add-opens=java.base/java.io=ALL-UNNAMED",
+                    "--add-opens=java.base/java.util=ALL-UNNAMED",
+                    "--add-opens=java.base/java.nio=ALL-UNNAMED",
+                    "--add-exports=java.base/jdk.internal.access=ALL-UNNAMED",
+                )
+                (findProperty("robolectric.dependency.dir") as String?)?.let {
+                    test.systemProperty("robolectric.dependency.dir", it)
+                    test.systemProperty("robolectric.offline", "true")
+                }
+            }
         }
     }
 

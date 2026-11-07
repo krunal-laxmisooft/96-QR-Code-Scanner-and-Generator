@@ -54,6 +54,7 @@ fun ProductContent(item: HistoryItem, parsed: ParsedCode.Product, state: ResultU
     }
     val pricesAvailable = product.prices != PricesState.Disabled
     if (pricesAvailable) {
+        Column {
         Row(Modifier.fillMaxWidth()) {
             ProductTab.entries.forEach { tab ->
                 val on = product.tab == tab
@@ -68,7 +69,8 @@ fun ProductContent(item: HistoryItem, parsed: ParsedCode.Product, state: ResultU
                 }
             }
         }
-        HorizontalDivider(color = c.outline, modifier = Modifier.padding(top = (-14).dp))
+        HorizontalDivider(color = c.outline)
+        }
     }
     if (!pricesAvailable || product.tab == ProductTab.DETAILS) DetailsTab(product.details, parsed.code) else PricesTab(product.prices, onEvent)
 }

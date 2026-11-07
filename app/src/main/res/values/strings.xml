@@ -34,7 +34,7 @@
     <string name="onboarding_start">Start scanning</string>
     <string name="onboarding_footnote">No account and no sign-up. InfScan asks for camera access when you first scan.</string>
     <string name="onboarding_store_1">FreshMart</string>
-    <string name="onboarding_store_2">CornerGrocer</string>
+    <string name="onboarding_store_2">CornerShop</string>
     <string name="onboarding_store_3">MegaStore</string>
     <string name="onboarding_price_1">$2.29</string>
     <string name="onboarding_price_2">$2.49</string>
@@ -61,6 +61,7 @@
     <string name="scan_batch_empty">Point the camera at codes to add them to this batch.</string>
     <string name="kind_website">Website</string>
     <string name="kind_wifi">Wi-Fi</string>
+    <string name="kind_wifi_network">Wi-Fi network</string>
     <string name="kind_contact">Contact</string>
     <string name="kind_event">Event</string>
     <string name="kind_text">Text</string>
@@ -213,6 +214,9 @@
     <string name="history_deleted">Deleted from History</string>
     <string name="history_empty_title">Nothing scanned yet</string>
     <string name="history_empty_body">Everything you scan or create shows up here, saved on this device only.</string>
+    <string name="history_empty_created_title">Nothing created yet</string>
+    <string name="history_empty_created_body">Codes you create show up here, saved on this device only.</string>
+    <string name="onboarding_barcode_digits">5012345</string>
     <string name="history_scan_a_code">Scan a code</string>
     <string name="filter_all">All</string>
     <string name="filter_links">Links</string>

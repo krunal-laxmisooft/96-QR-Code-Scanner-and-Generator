@@ -118,19 +118,20 @@ fun PriceIllustration(modifier: Modifier = Modifier) {
             val d = density
             drawCircle(c.soft, 118 * d, Offset(150 * d, 135 * d))
             rr(28f, 72f, 104f, 126f, 14f, c.surface, c.ink, 3f)
-            val total = bars.sum().toFloat() * 2
-            val unit = 80f / total
-            var x = 40f
+            val unit = 64f / (bars.sum() * 2)
+            var x = 48f
             bars.forEach { w ->
-                drawRect(c.ink, Offset(x * d, 84f * d), Size(w * unit * 2 * d, 52f * d))
-                x += w * unit * 2 * 2
+                drawRect(c.ink, Offset(x * d, 94f * d), Size(w * unit * d, 34f * d))
+                x += w * unit * 2
             }
+            drawLine(c.inkSecondary, Offset(132 * d, 130 * d), Offset(142 * d, 130 * d), 2 * d, StrokeCap.Round)
             rr(40f, 160f, 80f, 8f, 4f, c.outline)
             rr(40f, 176f, 52f, 8f, 4f, c.outline)
             listOf(70f to true, 120f to false, 170f to false).forEach { (y, best) ->
                 rr(146f, y, 132f, 38f, 12f, if (best) c.accent else c.surface, c.outline, 2f)
             }
         }
+        Text(stringResource(R.string.onboarding_barcode_digits), color = c.ink, style = InfTheme.type.monoSmall, modifier = Modifier.offset(48.dp, 132.dp))
         listOf(
             Triple(70f, Triple(R.string.onboarding_store_1, R.string.onboarding_price_1, true), 0),
             Triple(120f, Triple(R.string.onboarding_store_2, R.string.onboarding_price_2, false), 0),

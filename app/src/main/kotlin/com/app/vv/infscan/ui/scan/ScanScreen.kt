@@ -259,9 +259,9 @@ private fun BatchPanel(state: ScanUiState, onEvent: (ScanEvent) -> Unit, modifie
         Row(Modifier.height(48.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
             Text(stringResource(R.string.scan_batch_title, state.batch.size), style = InfTheme.type.titleSmall, color = c.ink, modifier = Modifier.weight(1f))
             if (state.batch.isNotEmpty()) {
-                InfButton(stringResource(R.string.scan_batch_csv), { onEvent(ScanEvent.ExportBatch) }, kind = ButtonKind.Tonal, icon = R.drawable.ic_download, height = 40.dp, fillWidth = false)
+                InfButton(stringResource(R.string.scan_batch_csv), { onEvent(ScanEvent.ExportBatch) }, kind = ButtonKind.Tonal, icon = R.drawable.ic_download, height = 40.dp, fillWidth = false, horizontalPadding = 14.dp)
             }
-            InfButton(stringResource(R.string.scan_batch_done), { onEvent(ScanEvent.FinishBatch) }, height = 40.dp, fillWidth = false)
+            InfButton(stringResource(R.string.scan_batch_done), { onEvent(ScanEvent.FinishBatch) }, height = 40.dp, fillWidth = false, horizontalPadding = 16.dp)
         }
         if (state.batch.isEmpty()) {
             Text(stringResource(R.string.scan_batch_empty), style = InfTheme.type.bodyMedium, color = c.inkSecondary, modifier = Modifier.padding(vertical = Space.sm))

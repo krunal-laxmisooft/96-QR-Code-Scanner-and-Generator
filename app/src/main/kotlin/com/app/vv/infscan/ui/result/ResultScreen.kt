@@ -76,17 +76,18 @@ fun ResultScreen(
                     is ParsedCode.Wifi -> WifiContent(item, parsed, state, onEvent)
                     else -> GenericContent(item, parsed, onEvent)
                 }
-                if (state.parsed !is ParsedCode.Product) {
-                    ActionRow(item.favorite, { onEvent(ResultEvent.Copy) }, { onEvent(ResultEvent.Share) }, { onEvent(ResultEvent.ToggleFavorite) })
-                }
+                val standard = state.parsed !is ParsedCode.Product && state.parsed !is ParsedCode.Wifi
+                if (standard) ActionRow(item.favorite, { onEvent(ResultEvent.Copy) }, { onEvent(ResultEvent.Share) }, { onEvent(ResultEvent.ToggleFavorite) })
                 adSlot()
-                Text(
-                    stringResource(R.string.result_saved_footer, relativeTimeLabel(item.createdAt, state.now)),
-                    style = InfTheme.type.caption,
-                    color = c.inkSecondary,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                if (standard) {
+                    Text(
+                        stringResource(R.string.result_saved_footer, relativeTimeLabel(item.createdAt, state.now)),
+                        style = InfTheme.type.caption,
+                        color = c.inkSecondary,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
         }
     }
@@ -102,7 +103,7 @@ private fun MissingResult(onBack: () -> Unit) {
 }
 
 @Composable
-fun ResultHeader(item: HistoryItem, parsed: ParsedCode) {
+fun ResultHeader(item: HistoryItem, parsed: ParsedCode, @StringRes kindLabel: Int = parsed.kind.label()) {
     val c = InfTheme.colors
     val source = when (item.source) {
         ScanSource.CAMERA -> R.string.source_camera
@@ -110,7 +111,7 @@ fun ResultHeader(item: HistoryItem, parsed: ParsedCode) {
         ScanSource.CREATED -> R.string.source_created
     }
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-        TypeChip(parsed.kind.icon(), stringResource(parsed.kind.label()))
+        TypeChip(parsed.kind.icon(), stringResource(kindLabel))
         Text(stringResource(R.string.result_source, stringResource(item.format.label()), stringResource(source)), style = InfTheme.type.caption.copy(fontSize = InfTheme.type.bodySmall.fontSize), color = c.inkSecondary)
     }
 }
@@ -154,9 +155,9 @@ private fun LinkNotice(link: LinkUiState) {
 @Composable
 private fun WifiContent(item: HistoryItem, parsed: ParsedCode.Wifi, state: ResultUiState, onEvent: (ResultEvent) -> Unit) {
     val c = InfTheme.colors
-    InfCard {
-        ResultHeader(item, parsed)
-        Text(parsed.ssid, style = InfTheme.type.result, color = c.ink)
+    InfCard(spacing = 6.dp) {
+        ResultHeader(item, parsed, R.string.kind_wifi_network)
+        Text(parsed.ssid, style = InfTheme.type.result, color = c.ink, modifier = Modifier.padding(top = 6.dp, bottom = 4.dp))
         DetailRow(stringResource(R.string.field_security), stringResource(parsed.security.label()))
         if (parsed.security != WifiSecurity.NONE) {
             DetailRow(

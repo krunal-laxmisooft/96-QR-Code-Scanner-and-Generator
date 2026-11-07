@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.ui.text.font.FontWeight
+import com.app.vv.infscan.ui.common.relativeTimeLabel
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Surface
@@ -61,12 +64,13 @@ class CreateHomeViewModel @Inject constructor(history: HistoryRepository) : View
 @Composable
 fun CreateHomeRoute(onSelect: (CreateType) -> Unit, onOpenRecent: (Long) -> Unit, viewModel: CreateHomeViewModel = hiltViewModel()) {
     val recent by viewModel.recent.collectAsStateWithLifecycle()
-    CreateHomeScreen(recent, onSelect, onOpenRecent, banner = { BannerAdSlot(AdPlacement.BANNER_CREATE) })
+    CreateHomeScreen(recent, System.currentTimeMillis(), onSelect, onOpenRecent, banner = { BannerAdSlot(AdPlacement.BANNER_CREATE) })
 }
 
 @Composable
 fun CreateHomeScreen(
     recent: HistoryItem?,
+    now: Long,
     onSelect: (CreateType) -> Unit,
     onOpenRecent: (Long) -> Unit,
     banner: @Composable () -> Unit,
@@ -85,7 +89,7 @@ fun CreateHomeScreen(
         ) {
             items(CreateType.entries, key = { it.name }) { type -> TypeTile(type, onSelect) }
             if (recent != null) {
-                item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) { RecentRow(recent, onOpenRecent) }
+                item(span = { GridItemSpan(maxLineSpan) }) { RecentRow(recent, now, onOpenRecent) }
             }
         }
         Box(Modifier.fillMaxWidth().padding(bottom = 10.dp, top = Space.sm), contentAlignment = Alignment.Center) { banner() }
@@ -113,7 +117,7 @@ private fun TypeTile(type: CreateType, onSelect: (CreateType) -> Unit) {
 }
 
 @Composable
-private fun RecentRow(item: HistoryItem, onOpen: (Long) -> Unit) {
+private fun RecentRow(item: HistoryItem, now: Long, onOpen: (Long) -> Unit) {
     val c = InfTheme.colors
     Column(Modifier.padding(top = Space.sm), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         SectionHeader(stringResource(R.string.create_recent))
@@ -127,7 +131,11 @@ private fun RecentRow(item: HistoryItem, onOpen: (Long) -> Unit) {
             Row(Modifier.padding(horizontal = Space.md), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Space.md)) {
                 com.app.vv.infscan.ui.components.InfIcon(item.codeKind.icon(), null, tint = c.primary, size = 22.dp)
                 Text(item.title, style = InfTheme.type.rowTitle.copy(fontSize = InfTheme.type.bodyLarge.fontSize, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = c.ink, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                Text(stringResource(item.codeKind.label()), style = InfTheme.type.caption.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Normal), color = c.inkSecondary)
+                Text(
+                    stringResource(R.string.history_row_subtitle, stringResource(item.codeKind.label()), relativeTimeLabel(item.createdAt, now, withTime = false)),
+                    style = InfTheme.type.caption.copy(fontWeight = FontWeight.Normal),
+                    color = c.inkSecondary,
+                )
             }
         }
     }

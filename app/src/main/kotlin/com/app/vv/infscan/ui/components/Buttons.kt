@@ -39,6 +39,7 @@ fun InfButton(
     enabled: Boolean = true,
     height: Dp = Sizes.button,
     fillWidth: Boolean = true,
+    horizontalPadding: Dp = Space.xl,
 ) {
     val c = InfTheme.colors
     val container: Color
@@ -68,7 +69,7 @@ fun InfButton(
             .sizeIn(minWidth = Sizes.touch),
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = if (fillWidth) 0.dp else Space.xl),
+            modifier = Modifier.padding(horizontal = if (fillWidth) 0.dp else horizontalPadding),
             horizontalArrangement = Arrangement.spacedBy(Space.sm, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
         ) {

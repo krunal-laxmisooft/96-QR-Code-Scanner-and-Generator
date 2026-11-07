@@ -159,6 +159,7 @@ fun InfChip(
 fun InfCard(
     modifier: Modifier = Modifier,
     padding: Dp = 18.dp,
+    spacing: Dp = Space.md,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val c = InfTheme.colors
@@ -169,7 +170,7 @@ fun InfCard(
             .background(c.surface)
             .border(1.dp, c.outline, Shapes.cardLarge)
             .padding(padding),
-        verticalArrangement = Arrangement.spacedBy(Space.md),
+        verticalArrangement = Arrangement.spacedBy(spacing),
         content = content,
     )
 }
